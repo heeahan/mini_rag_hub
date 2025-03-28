@@ -1,0 +1,32 @@
+version: '3.8'
+services:
+  app:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./storage:/storage
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+  milvus:
+    image: milvusdb/milvus:v2.3.0
+    container_name: milvus
+    ports:
+      - "19530:19530"
+      - "9091:9091"
+    environment:
+      - TZ=Asia/Seoul
+    restart: always
+
+  minio:
+    image: minio/minio
+    container_name: minio
+    ports:
+      - "9000:9000"
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: password
+    command: server /data
+    volumes:
+      - ./minio_data:/data
+    restart: always
